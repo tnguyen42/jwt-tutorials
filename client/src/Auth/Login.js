@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withContext } from "../AppContext";
 
 class LoginForm extends Component {
     constructor() {
@@ -53,4 +54,4 @@ class LoginForm extends Component {
     }
 }
 
-export default LoginForm;
+export default withContext(LoginForm);
