@@ -1,7 +1,15 @@
 import React, { Component } from "react";
 import axios from "axios";
 
+
+const todoAxios = axios.create();
 const AppContext = React.createContext();
+
+todoAxios.interceptors.request.use((config) => {
+	const token = localStorage.getItem("token");
+	config.headers.Authorization = `Bearer ${token}`;
+	return config;
+})
 
 export class AppContextProvider extends Component {
     constructor() {
@@ -18,7 +26,7 @@ export class AppContextProvider extends Component {
     }
 
     signup = (userInfo) => {
-		return axios.post("/auth/signup", userInfo)
+		return todoAxios.post("/auth/signup", userInfo)
 			.then(response => {
 				const { user, token } = response.data;
 				localStorage.setItem("token", token);
@@ -29,7 +37,7 @@ export class AppContextProvider extends Component {
 	}
 	
 	login = (credentials) => {
-		return axios.post("/auth/login", credentials)
+		return todoAxios.post("/auth/login", credentials)
 			.then(response => {
 				const { token, user } = response.data;
 				localStorage.setItem("token", token);
@@ -52,7 +60,7 @@ export class AppContextProvider extends Component {
 	}
 
     getTodos = () => {
-        return axios.get("/api/todo")
+        return todoAxios.get("/api/todo")
             .then(response => {
                 this.setState({ todos: response.data });
                 return response;
@@ -60,7 +68,7 @@ export class AppContextProvider extends Component {
     }
 
     addTodo = (newTodo) => {
-        return axios.post("/api/todo/", newTodo)
+        return todoAxios.post("/api/todo/", newTodo)
             .then(response => {
                 this.setState(prevState => {
                     return { todos: [...prevState.todos, response.data] }
@@ -70,7 +78,7 @@ export class AppContextProvider extends Component {
     }
 
     editTodo = (todoId, todo) => {
-        return axios.put(`/api/todo/${todoId}`, todo)
+        return todoAxios.put(`/api/todo/${todoId}`, todo)
             .then(response => {
                 this.setState(prevState => {
                     const updatedTodos = prevState.todos.map(todo => {
@@ -83,7 +91,7 @@ export class AppContextProvider extends Component {
     }
 
     deleteTodo = (todoId) => {
-        return axios.delete(`/api/todo/${todoId}`)
+        return todoAxios.delete(`/api/todo/${todoId}`)
             .then(response => {
                 this.setState(prevState => {
                     const updatedTodos = prevState.todos.filter(todo => {
